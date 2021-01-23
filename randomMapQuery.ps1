@@ -1,5 +1,5 @@
 
-$apikey="*****************"
+$apikey="*******************"
 
 function getSign{
     $signseed = Get-Random
@@ -42,7 +42,7 @@ function isLand($latitude, $longitude){
                     @(-43.500000,-11.500000,113.500000,153.000000,"Austraria"),
                     @(-47.000000,-36.000000,166.800000,178.400000,"Newzealand"),
                     @(-35.000000,36.600000,13.000000,50.800000,"Africa continent"),
-                    @(35.000000,70.800000,42.400000,47.500000,"Europe continent"),
+                    @(33.000000,70.800000,-13.000000,61.000000,"Europe continent"),
                     @(13.000000,47.000000,27.500000,66.000000,"Middle East"),
                     @(5.000000,75.000000,66.000000,144.000000,"Russia,China,and others"),
                     @(56.000000,71.000000,-167.000000,-62.000000,"Arasca"),
@@ -71,7 +71,7 @@ function getLatiLong{
     [bool]$land = isLand($latitude, $longitude) 
     if($land -eq $False){
         Write-Host "recursive call"
-        Start-Sleep 3
+        Start-Sleep 2
         getLatiLong
     }
     $latilongArr += $latitude
