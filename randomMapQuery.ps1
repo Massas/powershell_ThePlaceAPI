@@ -1,32 +1,39 @@
 
-$apikey="********"
+$apikey="***********"
 
-$latitudeint=Get-Random -Maximum 90 -Minimum 0
-$longitudeint=Get-Random -Maximum 180 -Minimum 0
+function getSign{
+    $signseed = Get-Random
+    $num = $signseed % 2
 
-$signseed_lat=Get-Random
-$signseed_lon=Get-Random
-
-$signnum_lat=$signseed_lat % 2
-$signnum_lon=$signseed_lon % 2
-
-if($signnum_lat -eq 1){
-    $minussign_lat ='-'
-}else {
-    $minussign_lat = ''
+    if($num -eq 1){
+        $ret ='-'
+    }else {
+        $ret = ''
+    }
+    return $ret
 }
 
-if($signnum_lon -eq 1){
-    $minussign_lon ='-'
-}else {
-    $minussign_lon = ''
+function getLatitude {
+    $latitudeint = Get-Random -Maximum 90 -Minimum 0
+    $sign = getSign
+    $latradix = Get-Random -Maximum 999999 -Minimum 0
+    $latitude = $sign + [string]$latitudeint + '.' + [string]$latradix
+
+    return $latitude
 }
 
-$latradix = Get-Random -Maximum 999999 -Minimum 0
-$lonradix = Get-Random -Maximum 999999 -Minimum 0
+function getLongitude {
+    $longitudeint = Get-Random -Maximum 180 -Minimum 0
+    $sign = getSign
+    $latradix = Get-Random -Maximum 999999 -Minimum 0
+    $longitude = $sign + [string]$longitudeint + '.' + [string]$latradix
+    
+    return $longitude
+}
 
-$latitude = $minussign_lat + [string]$latitudeint + '.' + [string]$latradix
-$longitude = $minussign_lon + [string]$longitudeint + '.' + [string]$lonradix
+# main
+$latitude = getLatitude
+$longitude = getLongitude
 
 $apicall="https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=$latitude,$longitude&radius=1000&type=political&key=$apikey"
 $response = Invoke-WebRequest $apicall -UseBasicParsing
