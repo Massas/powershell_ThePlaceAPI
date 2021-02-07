@@ -1,5 +1,5 @@
 
-$apikey="*******************"
+$apikey="************************"
 
 function getSign{
     $signseed = Get-Random
@@ -80,18 +80,29 @@ function getLatiLong{
     return $latilongArr
 }
 
-# main
-$arr = getLatiLong
+function getLatiLongMain{
+    $arr = getLatiLong
 
-[float]$latitude = $arr[0]
-[float]$longitude = $arr[1]
+    [float]$latitude = $arr[0]
+    [float]$longitude = $arr[1]
+    
+    Write-Host ""
+    Write-Host "latitude = ${latitude}"
+    Write-Host "longitude = ${longitude}"
+    
+    $apicall="https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=$latitude,$longitude&radius=50000&type=political&key=$apikey"
+    $response = Invoke-WebRequest $apicall -UseBasicParsing
+    
+    if($response -match "ZERO_RESULTS"){
+        Write-Host "recursive call(ZERO_RESULTS)"
+        Start-Sleep 1
+        $response = $null
+        getLatiLongMain
+    }
+    return $response
+}
 
-Write-Host ""
-Write-Host "latitude = ${latitude}"
-Write-Host "longitude = ${longitude}"
-
-$apicall="https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=$latitude,$longitude&radius=50000&type=political&key=$apikey"
-$response = Invoke-WebRequest $apicall -UseBasicParsing
-
+#main
+$response = getLatiLongMain
 
 Write-Host "CONTENT : $response"
