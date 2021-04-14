@@ -1,5 +1,11 @@
 
-$apikey="************************"
+$apikey="*********************************"
+
+# result continent name this time
+$result_continent_name = $null
+# array that result continent name(five times)
+$result_continent_arr = @()
+$tmp_continent_arr = @()
 
 function getSign{
     $signseed = Get-Random
@@ -35,8 +41,8 @@ function isLand($latitude, $longitude){
     Write-Host "[isLand]: start"
     [float]$lati = $latitude[0]
     [float]$longi = $latitude[1]
-    Write-Host "latitude = $lati"
-    Write-Host "longitude = $longi"
+#    Write-Host "latitude = $lati"
+#    Write-Host "longitude = $longi"
 
     $continentArr = @(
                     @(-43.500000,-11.500000,113.500000,153.000000,"Austraria"),
@@ -54,12 +60,33 @@ function isLand($latitude, $longitude){
     for($i = 0; $i -lt $continentArr.Count; $i++){
         if(($lati -gt $continentArr[$i][0]) -and ($lati -lt $continentArr[$i][1]) -and (($longi -gt $continentArr[$i][2]) -and ($longi -lt $continentArr[$i][3]))){
             $continent = $continentArr[$i][4]
+
+            # save in a global scope variable
+            $Global:result_continent_name = $continentArr[$i][4]
+            Write-Host "$result_continent_name"
+
             Write-Host "i: $i $continent"
+            Write-Host "[isLand]: end(true)"
             return $true
         }
     }
-    Write-Host "[isLand]: end"
+    Write-Host "[isLand]: end(false)"
     return $false
+}
+
+function isCorrespond($str){
+    Write-Host "[isCorrespond]: start"
+#    Write-Host "str:$str"
+    $continentName = $str
+
+    Write-Host "result_continent_arr: $result_continent_arr"
+
+    if($result_continent_arr -contains $continentName){
+        Write-Host "[isCorrespond]: end(false)"
+        return $false
+    }
+    Write-Host "[isCorrespond]: end(true)"
+    return $true
 }
 
 function getLatiLong{
@@ -71,9 +98,19 @@ function getLatiLong{
     [bool]$land = isLand($latitude, $longitude) 
     if($land -eq $False){
         Write-Host "recursive call"
-        Start-Sleep 2
+#        Start-Sleep 1
         getLatiLong
     }
+
+    # check the continent name whether correspond with past five times' result
+#    Write-Host "result_continent_name: $result_continent_name"
+    [bool]$correspond = isCorrespond($result_continent_name)
+    if($correspond -eq $False){
+        Write-Host "recursive call"
+#        Start-Sleep 1
+        getLatiLong
+    }
+
     $latilongArr += $latitude
     $latilongArr += $longitude
 
@@ -95,14 +132,35 @@ function getLatiLongMain{
     
     if($response -match "ZERO_RESULTS"){
         Write-Host "recursive call(ZERO_RESULTS)"
-        Start-Sleep 1
+#        Start-Sleep 1
         $response = $null
         getLatiLongMain
     }
+
+    if ($Global:result_continent_arr.Count -eq 5) {
+        $Global:tmp_continent_arr = $Global:result_continent_arr[1..($Global:result_continent_arr.Count - 1)]
+        $Global:result_continent_arr = $null
+        $Global:result_continent_arr = $Global:tmp_continent_arr
+    }
+    $Global:result_continent_arr += $result_continent_name
+    Write-Host "result_continent_arr:$result_continent_arr"
+    $Global:result_continent_name = $null
+
     return $response
 }
 
 #main
 $response = getLatiLongMain
-
 Write-Host "CONTENT : $response"
+
+while ($true) {
+    $select = Read-Host "if you want to quit, please enter 'q'"
+    if(($select -ne 'q') -or ($select -ne 'Q')){
+        $response = getLatiLongMain
+        Write-Host "CONTENT : $response"
+    }else {
+        Write-Host "terminate this program"
+        Start-Sleep 1
+        return
+    }   
+}
