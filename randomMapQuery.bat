@@ -1,2 +1,2 @@
-powershell -ExecutionPolicy Bypass -File C:\work\PowerShell\randomplay_ThePlaceAPI\randomMapQuery.ps1
+powershell -ExecutionPolicy Bypass -File .\randomMapQuery.ps1
 pause
