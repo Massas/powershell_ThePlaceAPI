@@ -7,7 +7,7 @@ $result_continent_name = $null
 $result_continent_arr = @()
 $tmp_continent_arr = @()
 
-# Place Type
+# default Place Type
 $placetype = "political" 
 
 function getSign{
@@ -62,7 +62,6 @@ function isLand($latitude, $longitude){
 
     for($i = 0; $i -lt $continentArr.Count; $i++){
         if(($lati -gt $continentArr[$i][0]) -and ($lati -lt $continentArr[$i][1]) -and (($longi -gt $continentArr[$i][2]) -and ($longi -lt $continentArr[$i][3]))){
-            $continent = $continentArr[$i][4]
 
             # save in a global scope variable
             $Global:result_continent_name = $continentArr[$i][4]
