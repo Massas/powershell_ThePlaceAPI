@@ -7,6 +7,9 @@ $result_continent_name = $null
 $result_continent_arr = @()
 $tmp_continent_arr = @()
 
+# Place Type
+$placetype = "political" 
+
 function getSign{
     $signseed = Get-Random
     $num = $signseed % 2
@@ -128,7 +131,8 @@ function getLatiLongMain{
 #   Write-Host "latitude = ${latitude}"
 #    Write-Host "longitude = ${longitude}"
     
-    $apicall="https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=$latitude,$longitude&radius=50000&type=political&key=$apikey"
+    
+    $apicall="https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=$latitude,$longitude&radius=50000&type=$placetype&key=$apikey"
     $response = Invoke-WebRequest $apicall -UseBasicParsing
     
     if($response -match "ZERO_RESULTS"){
@@ -188,10 +192,8 @@ function find_name($str) {
 # parse and write to file
 function parse_write($str){
 
-    # "name"Ç™å©Ç¬Ç©ÇÈä‘ÉãÅ[Évèàóù
     while($str.IndexOf('geometry') -ne -1){
 #        Write-host "found geometry"
-        # "CONTENT : {"Ç‹Ç≈à⁄ìÆÇ∑ÇÈ
         $tmp1 = find_geometry($str)
 
         $strtmp = $tmp1
@@ -205,20 +207,113 @@ function parse_write($str){
 
 }
 
+function Select-PlaceType{
+
+    $placetype_arr = @("political",
+                        "locality",
+                        "administrative_area_level_1",
+                        "administrative_area_level_2",
+                        "administrative_area_level_3",
+                        "administrative_area_level_4",
+                        "church",
+                        "university",
+                        "hindu_temple",
+                        "stadium",
+                        "mosque",
+                        "lodging",
+                        "premise",
+                        "point_of_interest",
+                        "sublocality",
+                        "natural_feature")
+
+    $Font = New-Object System.Drawing.Font("Meiryo UI",12)
+    $form = New-Object System.Windows.Forms.Form
+    $form.Text = "Select"
+    $form.Size = New-Object System.Drawing.Size(600,450)
+    $form.StartPosition = "Manual"
+    $form.font = $Font
+
+    $label = New-Object System.Windows.Forms.Label
+    $label.Location = New-Object System.Drawing.Point(10,10)
+    $label.Size = New-Object System.Drawing.Size(500,40)
+    $label.Text = "place type settings"
+    $form.Controls.Add($label)
+
+    $OKButton = New-Object System.Windows.Forms.Button
+    $OKButton.Location = New-Object System.Drawing.Point(40,100)
+    $OKButton.Size = New-Object System.Drawing.Size(75,30)
+    $OKButton.Text = "OK"
+    $OKButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
+    $form.AcceptButton = $OKButton
+    $form.Controls.Add($OKButton)
+
+    $CancelButton = New-Object System.Windows.Forms.Button
+    $CancelButton.Location = New-Object System.Drawing.Point(130,100)
+    $CancelButton.Size = New-Object System.Drawing.Size(75,30)
+    $CancelButton.Text = "Cancel"
+    $CancelButton.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
+    $form.CancelButton = $CancelButton
+    $form.Controls.Add($CancelButton)
+
+    $Combo = New-Object System.Windows.Forms.Combobox
+    $Combo.Location = New-Object System.Drawing.Point(50,50)
+    $Combo.size = New-Object System.Drawing.Size(500,60)
+    $Combo.DropDownStyle = "DropDown"
+    $Combo.FlatStyle = "standard"
+    $Combo.font = $Font
+
+    # Add an array item to the combo box
+    ForEach ($select in $placetype_arr){
+        [void] $Combo.Items.Add("$select")
+    }
+
+    $form.Controls.Add($Combo)
+    $form.Topmost = $True
+    $result = $form.ShowDialog()
+
+    if ($result -eq "OK")
+    {
+        $ret = $combo.Text
+    }else{
+        return
+    }
+
+    Write-Host "[selected]: $ret"
+
+    return $ret
+}
+
 # global variables
 $Global:result_str_arr = @()
 $Global:result_str_arr += "======================`n"
 
 #main
-$response = getLatiLongMain
-# parse and write to file
-parse_write([string]$response)
+# Loading an assembly
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
 
 $Global:result_str_arr -replace '"', '' | Add-Content "./result.log" -Encoding Default
 
 while ($true) {
-    $select = Read-Host "if you want to quit, please enter 'q'"
-    if(($select -ne 'q') -or ($select -ne 'Q')){
+    Write-Host ""
+    Write-Host "[[MAIN FUNCTION]]"
+    Write-Host "mode is below."
+    Write-Host "search places : ENTER"
+    Write-Host "place type setting : s"
+    Write-Host "quit : q"
+    Write-Host ""
+
+    $select = Read-Host "<<MODE SELECT>>"
+    if(($select -eq 's') -or ($select -eq 'S')){
+        # place type setting
+        # sample : set amusement_park
+        $placetype = Select-PlaceType
+        continue
+    }elseif(($select -eq 'q') -or ($select -eq 'Q')){
+        Write-Host "terminate this program"
+        Start-Sleep 1
+        return
+    }else{
         # global variables
         $Global:result_str_arr = $null
         $Global:result_str_arr += "======================`n"
@@ -230,10 +325,7 @@ while ($true) {
 
         $Global:result_str_arr -replace '"', '' | Add-Content "./result.log" -Encoding Default
 
-    }else {
-        Write-Host "terminate this program"
-        Start-Sleep 1
-        return
-    }   
+        continue
+    }
 }
 
