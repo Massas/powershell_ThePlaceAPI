@@ -9,10 +9,10 @@ API's documentation: https://developers.google.com/maps/documentation/places/web
 ## main menu
 ![main menu](sample/main_menu.png)  
 
-## setting for place type
+## setting for continent
 ![setting1](sample/setting1.png)  
 
-## setting for continent
+## setting for place type
 ![setting2](sample/seting2.png)  
 
 ## information sample1
