@@ -5,6 +5,10 @@ get place information (political name:city,distorict area etc...) by Places API,
 
 API's documentation: https://developers.google.com/maps/documentation/places/web-service/overview
 
+## requirement
+・Google Map's Developer account  
+・Places API's API key  
+
 ## This repo's sample is below.
 ## main menu
 ![main menu](sample/main_menu.png)  
