@@ -1,6 +1,11 @@
 # powershell_ThePlaceAPI
-get place information (political name:city,distorict area etc...) by The Place API, the google Map with powershell
 
+## summary
+get place information (political name:city,distorict area etc...) by Places API, the google Map with powershell
+
+API's documentation: https://developers.google.com/maps/documentation/places/web-service/overview
+
+## This repo's sample is below.
 ## main menu
 ![main menu](sample/main_menu.png)  
 
