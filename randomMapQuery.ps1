@@ -1,5 +1,5 @@
 
-$apikey="**********************"
+#$apikey="**********************"
 
 # result continent name this time
 $result_continent_name = $null
@@ -63,10 +63,17 @@ function isLand($latitude, $longitude){
     for($i = 0; $i -lt $continentArr.Count; $i++){
         if(($lati -gt $continentArr[$i][0]) -and ($lati -lt $continentArr[$i][1]) -and (($longi -gt $continentArr[$i][2]) -and ($longi -lt $continentArr[$i][3]))){
 
+            #issue 4 continent setting
+            if ($Global:continent_setting -eq "none") {
+                # do nothing
+            } elseif ($continentArr[$i][4] -ne $Global:continent_setting) {
+                Write-Host "[isLand]: end(continent setting false)"
+                return $false
+            }
             # save in a global scope variable
             $Global:result_continent_name = $continentArr[$i][4]
 
-            Write-Host "$Global:result_continent_name"
+            Write-Host "[isLand]$Global:result_continent_name"
 
 #            Write-Host "i: $i $continent"
             Write-Host "[isLand]: end(true)"
@@ -83,10 +90,11 @@ function isCorrespond($str){
     $continentName = $str
 
 #    Write-Host "result_continent_arr: $result_continent_arr"
-
-    if($result_continent_arr -contains $continentName){
-#        Write-Host "[isCorrespond]: end(false)"
-        return $false
+    if ($Global:continent_setting -eq "none") {
+        if($result_continent_arr -contains $continentName){
+    #        Write-Host "[isCorrespond]: end(false)"
+            return $false
+        }                    
     }
 #    Write-Host "[isCorrespond]: end(true)"
     return $true
@@ -206,6 +214,31 @@ function parse_write($str){
 
 }
 
+function Select-ContinentSetting {
+    Write-Host "[Select-ContinentSetting] START"
+    $continents = @(
+                    "Austraria",
+                    "Newzealand",
+                    "Africa continent",
+                    "Europe continent",
+                    "Middle East",
+                    "Russia,China,and others",
+                    "Arasca",
+                    "USA",
+                    "Central America & carib",
+                    "South America",
+                    "none"
+                );
+    for ($num = 0; $num -lt $continents.Length; $num++) {
+        Write-Host $num ": "$continents[$num]
+    }
+    $select = Read-Host "<SELECT CONTINENT NUMBER>"
+    $str = $continents[$select]
+    Write-Host "select: $str"
+    Write-Host "[Select-ContinentSetting] END"
+    return $str
+}
+
 function Select-PlaceType{
 
     $placetype_arr = @("political",
@@ -285,6 +318,7 @@ function Select-PlaceType{
 # global variables
 $Global:result_str_arr = @()
 $Global:result_str_arr += "======================`n"
+$Global:continent_setting = "none"
 
 #main
 # Loading an assembly
@@ -299,6 +333,7 @@ while ($true) {
     Write-Host "mode is below."
     Write-Host "search places : ENTER"
     Write-Host "place type setting : s"
+    Write-Host "continent setting : c"
     Write-Host "quit : q"
     Write-Host ""
 
@@ -307,6 +342,10 @@ while ($true) {
         # place type setting
         # sample : set amusement_park
         $placetype = Select-PlaceType
+        continue
+    }elseif(($select -eq 'c') -or ($select -eq 'C')){
+        #issue 4 continent setting
+        $Global:continent_setting = Select-ContinentSetting
         continue
     }elseif(($select -eq 'q') -or ($select -eq 'Q')){
         Write-Host "terminate this program"
