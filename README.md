@@ -9,7 +9,7 @@ API's documentation: https://developers.google.com/maps/documentation/places/web
 ## main menu
 ![main menu](sample/main_menu.png)  
 
-## setting for palace type
+## setting for place type
 ![setting1](sample/setting1.png)  
 
 ## setting for continent
