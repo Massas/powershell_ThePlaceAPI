@@ -201,6 +201,8 @@ function parse_write($str){
 
     while($str.IndexOf('geometry') -ne -1){
 #        Write-host "found geometry"
+        $tmp2 = $str
+        $str = $tmp2 -replace '"', '' 
         $tmp1 = find_geometry($str)
 
         $strtmp = $tmp1
