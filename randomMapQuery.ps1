@@ -1,6 +1,3 @@
-
-#$apikey="**********************"
-
 # result continent name this time
 $result_continent_name = $null
 # array that result continent name(five times)
@@ -9,6 +6,11 @@ $tmp_continent_arr = @()
 
 # default Place Type
 $placetype = "political" 
+
+function Get-APIKey {
+    [String]$apikey = Get-Content .\apikey
+    return $apikey
+}
 
 function getSign{
     $signseed = Get-Random
@@ -329,6 +331,8 @@ $Global:continent_setting = "none"
 # Loading an assembly
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
+
+$apikey = Get-APIKey
 
 $Global:result_str_arr -replace '"', '' | Add-Content "./result.log" -Encoding Default
 
