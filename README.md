@@ -1,5 +1,7 @@
 # powershell_ThePlaceAPI
 
+<img alt="GitHub all releases" src="https://img.shields.io/github/downloads/Massas/powershell_ThePlaceAPI/total?style=plastic">
+
 ## summary
 get place information (political name:city,distorict area etc...) by Places API, the google Map with powershell
 
